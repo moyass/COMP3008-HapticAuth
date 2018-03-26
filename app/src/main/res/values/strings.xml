@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">COMP3008 - Authentication Imp.</string>
+    <string name="you_have_successfully_logged_in">You have successfully logged in !!</string>
+    <string name="log_out">Log out</string>
     <string name="tap_in_your_sequence">Tap in your sequence</string>
     <string name="todo">TODO</string>
+    <string name="generate">Generate</string>
 </resources>
