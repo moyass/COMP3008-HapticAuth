@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">COMP3008 - Authentication Imp.</string>
+    <string name="tap_in_your_sequence">Tap in your sequence</string>
+    <string name="todo">TODO</string>
+</resources>
