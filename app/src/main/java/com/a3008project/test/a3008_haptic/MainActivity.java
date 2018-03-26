@@ -1,28 +1,15 @@
 package com.a3008project.test.a3008_haptic;
 
-import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
-import android.os.Parcelable;
-import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.GridView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * DOCUMENTATION FOR VIBRATION
@@ -47,9 +34,9 @@ public class MainActivity extends AppCompatActivity {
     Pattern currentInputPattern;
 
     //long startTime = System.currentTimeMillis();
-    long firstIterval;
+    long oldTime, currentTime;
+
     long maxTime = (10*1000);
-    long elapsedTime = 0L;
 
     ArrayList<Long> intervalsBetweenTaps = new ArrayList<>();
     ArrayList<Integer> ints = new ArrayList<>();
@@ -86,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Vibrate the phone for some haptic feedback for the user
                 vibrator.vibrate(20);
+
                 // Change the background color
 
 
@@ -93,12 +81,33 @@ public class MainActivity extends AppCompatActivity {
                 // between tapping the actual screen and actually vibrating.
                 // this will help get a more accurate recording
 
+                /**
+                 * LOGIC
+                 * if timer is not started
+                 * start timer and set flag
+                 *
+                 * if timer is started
+                 * set current interval to old - new
+                 * ... repeat until either time is up
+                 * or user has not tapped the the button in 3 seconds
+                 *
+                 *
+
                 if (!START_TIMER) {
                     START_TIMER = true;
-                    firstIterval = System.currentTimeMillis();
+                    oldTime = System.currentTimeMillis();
+
+                } else if (System.currentTimeMillis() - oldTime >= maxTime) {
+                    oldTime = 0;
+                    currentTime = 0;
                 } else {
                     // It has been tapped at least once so far
+                    currentTime = System.currentTimeMillis();
+                    intervalsBetweenTaps.add(currentTime - oldTime);
+                    System.out.println(" Current Interval " + (currentTime - oldTime));
                 }
+                 */
+
 
             }
         });
@@ -113,13 +122,29 @@ public class MainActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_DOWN:
                         if (mHandler != null) return true;
                         mHandler = new Handler();
-                        mHandler.postDelayed(mAction, 10);
+                        mHandler.postDelayed(mAction, 0);
+
+                        if (!START_TIMER) {
+                            START_TIMER = true;
+                            oldTime = System.currentTimeMillis();
+
+                        } else if (System.currentTimeMillis() - oldTime >= maxTime) {
+                            oldTime = 0;
+                            currentTime = 0;
+                            START_TIMER = false;
+                        } else {
+                            // It has been tapped at least once so far
+                            currentTime = System.currentTimeMillis();
+                            intervalsBetweenTaps.add(currentTime - oldTime);
+                            System.out.println(" Current Interval " + (currentTime - oldTime));
+                        }
+
                         break;
                     case MotionEvent.ACTION_UP:
                         if (mHandler == null) return true;
                         mHandler.removeCallbacks(mAction);
                         mHandler = null;
-                        System.out.println("OMG FINALLY!!!");
+                        //System.out.println("OMG FINALLY!!!");
                         break;
                 }
                 return false;
@@ -133,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
             Runnable mAction = new Runnable() {
                 @Override public void run() {
-                    System.out.println("HOLDING!!!");
+                    //System.out.println("HOLDING!!!");
                     mHandler.postDelayed(this, 10);
                 }
             };
