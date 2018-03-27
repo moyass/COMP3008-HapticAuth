@@ -18,4 +18,21 @@ public class Pattern {
         RatioList = inputRatios;
         numberOfTaps = inputNumberOfTaps;
     }
+
+    Pattern (){
+        Generate();
+    }
+
+    public void Generate() {
+        // In charge of generating a pattern
+
+        return;
+    }
+
+    public boolean Compare(Pattern input1, Pattern input2) {
+        // Compare two patterns and see if they are similar
+        // In the case someone types in their pattern slower
+
+        return true;
+    }
 }

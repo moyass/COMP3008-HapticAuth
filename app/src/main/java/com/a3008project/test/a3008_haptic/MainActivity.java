@@ -1,5 +1,6 @@
 package com.a3008project.test.a3008_haptic;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
 
-    ArrayList<Pattern> listOfPatterns;
+    ArrayList<Pattern> listOfPatterns = new ArrayList<>();
 
     Button button;
     Boolean START_TIMER = false;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     //long startTime = System.currentTimeMillis();
     long oldTime, currentTime;
+    long currentInterval;
 
     long maxTime = (10*1000);
 
@@ -69,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
 
         button.setOnClickListener(new View.OnClickListener() {
 
+
+
             @Override
             public void onClick(View v) {
                 // Vibrate the phone for some haptic feedback for the user
@@ -91,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                  * ... repeat until either time is up
                  * or user has not tapped the the button in 3 seconds
                  *
-                 *
+                 */
 
                 if (!START_TIMER) {
                     START_TIMER = true;
@@ -100,45 +104,46 @@ public class MainActivity extends AppCompatActivity {
                 } else if (System.currentTimeMillis() - oldTime >= maxTime) {
                     oldTime = 0;
                     currentTime = 0;
+                    START_TIMER = false;
+                    /**
+                     * Assuming the user has completed his input
+                     * We need to now store a Pattern based on his input
+                     */
+
+                    // Create a pattern based on the current input
+                    currentInputPattern = new Pattern(intervalsBetweenTaps,0);
+
+                    // Total list of patterns
+                    listOfPatterns.add(currentInputPattern);
+
                 } else {
                     // It has been tapped at least once so far
                     currentTime = System.currentTimeMillis();
-                    intervalsBetweenTaps.add(currentTime - oldTime);
-                    System.out.println(" Current Interval " + (currentTime - oldTime));
+                    currentInterval = currentTime - oldTime;
+                    intervalsBetweenTaps.add(currentInterval);
+                    System.out.println(" Current Interval " + (currentInterval));
                 }
-                 */
+
 
 
             }
         });
 
-        // TODO: Fix dis
-        button.setOnTouchListener(new View.OnTouchListener() {
 
+        /**
+         * HOLDING IS NOT USED AS OF YET
+         *
+        button.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
             private Handler mHandler;
 
             @Override public boolean onTouch(View v, MotionEvent event) {
                 switch(event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         if (mHandler != null) return true;
+                        v.performClick();
                         mHandler = new Handler();
                         mHandler.postDelayed(mAction, 0);
-
-                        if (!START_TIMER) {
-                            START_TIMER = true;
-                            oldTime = System.currentTimeMillis();
-
-                        } else if (System.currentTimeMillis() - oldTime >= maxTime) {
-                            oldTime = 0;
-                            currentTime = 0;
-                            START_TIMER = false;
-                        } else {
-                            // It has been tapped at least once so far
-                            currentTime = System.currentTimeMillis();
-                            intervalsBetweenTaps.add(currentTime - oldTime);
-                            System.out.println(" Current Interval " + (currentTime - oldTime));
-                        }
-
                         break;
                     case MotionEvent.ACTION_UP:
                         if (mHandler == null) return true;
@@ -150,12 +155,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
 
-            Runnable mCountMili = new Runnable(){
-                @Override public void run() {
-                    // Record the time
-                }
-            };
-
             Runnable mAction = new Runnable() {
                 @Override public void run() {
                     //System.out.println("HOLDING!!!");
@@ -163,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             };
 
-        });
+        }); */
     }
+
 }
