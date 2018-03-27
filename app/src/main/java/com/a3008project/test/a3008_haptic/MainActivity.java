@@ -3,13 +3,13 @@ package com.a3008project.test.a3008_haptic;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -35,17 +35,15 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final String ALPHA_NUMERIC_STRING = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    ArrayList<Pattern> listOfPatterns = new ArrayList<>();
+    //ArrayList<Pattern> listOfPatterns = new ArrayList<>();
     ArrayList<User> users = new ArrayList<>();
 
-    Button button, createSequence, loginButton;
+    Button bigTapTap, createSequence, loginButton;
+    ImageButton ProfileButton;
     Boolean START_TIMER = false, CREATE_NEW = false;
     Pattern currentInputPattern;
     User currentUser = new User();
-
-    //long startTime = System.currentTimeMillis();
     long oldTime, currentTime;
     long currentInterval;
 
@@ -56,9 +54,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     ArrayList<Long> intervalsBetweenTaps = new ArrayList<>();
-    ArrayList<Integer> ints = new ArrayList<>();
 
     Vibrator vibrator;
+
+    // Timer to make sure that the user can only use up to 10 seconds or whatever maxTime is
+    Timer stopWatch;
 
     /**
     * Store the input as follows:
@@ -69,31 +69,6 @@ public class MainActivity extends AppCompatActivity {
     **/
 
 
-    // Count down to limit the space to 10 seconds per sequence
-    CountDownTimer cT =  new CountDownTimer(maxTime, 1000) {
-
-        public void onTick(long millisUntilFinished) {
-
-            String v = String.format("%02d", millisUntilFinished / 60000);
-            int va = (int) ((millisUntilFinished % 60000) / 1000);
-            statusText.setText("seconds remaining: " + v + ":" + String.format("%02d", va));
-        }
-
-        public void onFinish() {
-            statusText.setText("Stop!!");
-        }
-    };
-
-    // Generate a username that is 7 characters long
-    public static String generateUserName() {
-        int count = 7;
-        StringBuilder builder = new StringBuilder();
-        while (count-- != 0) {
-            int character = (int)(Math.random()*ALPHA_NUMERIC_STRING.length());
-            builder.append(ALPHA_NUMERIC_STRING.charAt(character));
-        }
-        return builder.toString();
-    }
 
 
 
@@ -106,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Collect the elements from the activity and store them into objects
-        button = findViewById(R.id.button1);
+        bigTapTap = findViewById(R.id.button1);
 
         // Create a sequence
         createSequence = findViewById(R.id.createButton);
@@ -114,16 +89,48 @@ public class MainActivity extends AppCompatActivity {
         // Login using a sequence you created earlier
         loginButton = findViewById(R.id.loginButton);
 
-        // The text between the big button and the profile picture
+        // The text between the big bigTapTap and the profile picture
         statusText = findViewById(R.id.countDown);
+        statusText.setText("");
 
-        // Username
+        // Username text object
         userName = findViewById(R.id.usernameText);
-        //userName.setText(generateUserName());
+
+        // Change username
+        ProfileButton = findViewById(R.id.imageButton);
+
+        // Generate a username every time the app is launched
+        currentUser.generateUserName();
+
+        // Set the initial username since the app has started
+        userName.setText(currentUser.getUsername());
+        System.out.println("DEBUG: User name is "+  currentUser.getUsername());
 
         // Initialize the vibrator
         vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 
+        stopWatch = new Timer(statusText, maxTime);
+
+
+
+        final CountDownTimer cT =  new CountDownTimer(maxTime, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                //hasTimerStarted = true;
+                String v = String.format("%02d", millisUntilFinished / 60000);
+                int va = (int) ((millisUntilFinished % 60000) / 1000);
+                statusText.setText("seconds remaining: " + v + ":" + String.format("%02d", va));
+            }
+
+            public void onFinish() {
+                //hasTimerStarted = false;
+                statusText.setText("Press one more time to confirm input");
+            }
+        };
+
+
+
+        // Create button
         createSequence.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,15 +139,50 @@ public class MainActivity extends AppCompatActivity {
                 CREATE_NEW = true;
                 START_TIMER = true;
 
-                currentUser.setUsername((generateUserName()));
-
                 userName.setText(currentUser.getUsername());
-                //cT.start();
+
 
             }
         });
 
-        button.setOnClickListener(new View.OnClickListener() {
+
+        // Create a new user
+        // TODO: Show dialog saying are you sure
+        ProfileButton.setOnClickListener(new View.OnClickListener() {
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            System.out.println("DEBUG: Creating a new user. Resetting all fields");
+                            CREATE_NEW = true;
+                            START_TIMER = true;
+                            currentUser = new User();
+                            userName.setText(currentUser.getUsername());
+                            //stopWatch.cT.cancel();
+                            cT.cancel();
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            System.out.println("DEBUG: Canceled the making of a new user.");
+                            break;
+                    }
+                }
+            };
+            @Override
+            public void onClick(View v) {
+                Context context  = v.getContext();
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Create new user")
+                        .setMessage("This will store the previous user in the database and make a new user.")
+                        .setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener)
+                        .show();
+            }
+        });
+
+
+        // Main Button aka the tap tap
+        bigTapTap.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -155,13 +197,16 @@ public class MainActivity extends AppCompatActivity {
                  * if timer is started
                  * set current interval to old - new
                  * ... repeat until either time is up
-                 * or user has not tapped the the button in 10 seconds
+                 * or user has not tapped the the bigTapTap in 10 seconds
                  *
                  */
 
                 if (!START_TIMER) {
                     START_TIMER = true;
                     oldTime = System.currentTimeMillis();
+
+                    //stopWatch.cT.start();
+                    //stopWatch.start();
                     cT.start();
 
                 } else if (System.currentTimeMillis() - oldTime >= maxTime) {
@@ -169,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
                     currentTime = 0;
                     START_TIMER = false;
                     CREATE_NEW = false;
+
                     /**
                      * Assuming the user has completed his input
                      * We need to now store a Pattern based on his input
@@ -176,12 +222,10 @@ public class MainActivity extends AppCompatActivity {
 
                     // Create a pattern based on the current input
                     currentInputPattern = new Pattern(intervalsBetweenTaps,0);
-
-
                     currentUser.setPattern(currentInputPattern);
 
-                    // Total list of patterns
-                    listOfPatterns.add(currentInputPattern);
+                    //Add
+                    users.add(currentUser);
 
                     // Clear
                     intervalsBetweenTaps.clear();
@@ -191,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
                     currentTime = System.currentTimeMillis();
                     currentInterval = currentTime - oldTime;
                     intervalsBetweenTaps.add(currentInterval);
-                    System.out.println(" Current Interval " + (currentInterval));
+                    System.out.println("DEBUG: Current Interval " + (currentInterval));
                 }
 
 
