@@ -24,7 +24,8 @@ public class Pattern {
     }
 
     public void Generate() {
-        // In charge of generating a pattern
+        // In the case a ratiolist isn't included, we should by default generate a new pattern
+
 
         return;
     }

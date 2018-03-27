@@ -39,10 +39,10 @@
         android:layout_width="500dp"
         android:layout_height="12dp"
         android:layout_marginEnd="191dp"
-        android:layout_marginRight="193dp"
+        android:layout_marginRight="191dp"
         android:layout_marginStart="193dp"
         android:layout_marginLeft="193dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="116dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
@@ -61,8 +61,10 @@
         android:text=""
         app:layout_constraintBottom_toTopOf="@+id/space2"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/space" />
+        app:layout_constraintTop_toBottomOf="@+id/space"
+        app:layout_constraintVertical_bias="1.0" />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -89,12 +91,28 @@
         android:layout_marginTop="269dp"
         android:text="@string/generate"
         app:layout_constraintBottom_toTopOf="@+id/space2"
-        app:layout_constraintEnd_toStartOf="@+id/button3"
+        app:layout_constraintEnd_toStartOf="@+id/createButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/space" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="269dp"
+        android:text="@string/login"
+        app:layout_constraintBottom_toTopOf="@+id/space2"
+        app:layout_constraintEnd_toStartOf="@+id/createButton"
+        app:layout_constraintStart_toEndOf="@+id/button2"
+        app:layout_constraintTop_toBottomOf="@+id/space" />
+
+    <Button
+        android:id="@+id/createButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
@@ -103,11 +121,39 @@
         android:layout_marginStart="100dp"
         android:layout_marginLeft="100dp"
         android:layout_marginTop="269dp"
-        android:text="@string/generate"
+        android:text="@string/create"
         app:layout_constraintBottom_toTopOf="@+id/space2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/button2"
         app:layout_constraintTop_toBottomOf="@+id/space" />
+
+    <TextView
+        android:id="@+id/countDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="150dp"
+        android:layout_marginStart="150dp"
+        android:layout_marginTop="17dp"
+        android:text="00"
+        app:layout_constraintBottom_toTopOf="@+id/button1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/space" />
+
+    <TextView
+        android:id="@+id/usernameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="150dp"
+        android:layout_marginStart="150dp"
+        android:layout_marginTop="5dp"
+        android:text="@string/username"
+        app:layout_constraintBottom_toTopOf="@+id/space"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
 
 </android.support.constraint.ConstraintLayout>
