@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Vibrator;
+import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,7 +40,6 @@ import java.util.ArrayList;
  * User taps the square -> get current time
  *                                           ] -> firstInterval
  * User taps the square -> get current time
- *
  *
  * Usage
  * User opens the app
@@ -63,20 +64,20 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "DEBUG";
-    //ArrayList<Pattern> listOfPatterns = new ArrayList<>();
     ArrayList<User> users = new ArrayList<>();
 
     Button bigTapTap, createSequence, loginButton;
     ImageButton ProfileButton;
     Boolean START_TIMER = false, CREATE_NEW = false;
     Pattern currentInputPattern;
+
     User currentUser = new User();
+
     long oldTime, currentTime;
     long currentInterval;
     int numberOfTaps = 0;
 
-    Logger logger = new Logger("userdata.csv");
+    Logger logger = new Logger("userdata.txt");
 
     long maxTime = (10*1000);
 
@@ -130,11 +131,13 @@ public class MainActivity extends AppCompatActivity {
         // Generate a username every time the app is launched
         currentUser.generateUserName();
 
+        logger.writeToFile("",false);
+
         // Set the initial username since the app has started
         userName.setText(currentUser.getUsername());
         System.out.println("DEBUG: User name is "+  currentUser.getUsername());
 
-        logger.writeToFile("SUCK A DICK", true);
+        logger.writeToFile("HI... DO YOU KNOW DE WEI? \n",true);
 
         // Initialize the vibrator
         vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
@@ -170,7 +173,8 @@ public class MainActivity extends AppCompatActivity {
 
                 userName.setText(currentUser.getUsername());
                 bigTapTap.setEnabled(true);
-
+                logger.Set(DataEnum.USER_ID, currentUser.getUsername());
+                logger.writeToFile(currentUser.getUsername(),true);
 
             }
         });
@@ -189,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
                             START_TIMER = true;
                             currentUser = new User();
                             userName.setText(currentUser.getUsername());
+                            logger.Set(DataEnum.USER_ID, currentUser.getUsername());
                             //stopWatch.cT.cancel();
                             cT.cancel();
                             break;
@@ -229,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
                  * set current interval to old - new
                  * ... repeat until either time is up
                  * or user has not tapped the the bigTapTap in 10 seconds
+                 *
                  */
 
                 if (!START_TIMER) {
@@ -258,6 +264,8 @@ public class MainActivity extends AppCompatActivity {
                     currentInputPattern = new Pattern(intervalsBetweenTaps,numberOfTaps);
                     currentUser.setPattern(currentInputPattern);
 
+                    logger.writeToFile(currentUser.getUsername(),true);
+
                     // Add
                     users.add(currentUser);
 
@@ -271,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
                     currentInterval = currentTime - oldTime;
                     intervalsBetweenTaps.add(currentInterval);
                     System.out.println("DEBUG: Current Interval " + (currentInterval) + " NOT = "+numberOfTaps);
+
                 }
 
 
