@@ -36,6 +36,10 @@ public class Pattern {
     public boolean Compare(Pattern input) {
         // Compare two patterns and see if they are similar
         // In the case someone types in their pattern slower
+        // sample: 940,1287,3312,3671,4797,5698,5999
+
+
+
 
         if(input.getRatioList().size() != RatioList.size()){
             System.out.println("DEBUG: The input ratio list is not the same. [DIFF SIZES]");

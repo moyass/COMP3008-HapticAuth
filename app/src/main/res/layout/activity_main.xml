@@ -102,7 +102,7 @@
         android:id="@+id/createButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="10dp"
         android:layout_marginEnd="34dp"
         android:layout_marginStart="100dp"
         android:layout_marginTop="269dp"
@@ -138,33 +138,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingActionButton"
-        android:layout_width="70dp"
-        android:layout_height="55dp"
-        android:layout_marginBottom="44dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:clickable="true"
-        app:backgroundTint="@android:color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.657"
-        app:layout_constraintStart_toEndOf="@+id/loginButton"
-        app:layout_constraintTop_toTopOf="@+id/createButton"
-        app:layout_constraintVertical_bias="0.755"
-        app:srcCompat="@android:drawable/ic_input_add" android:focusable="true" />
-
     <ImageButton
         android:id="@+id/imageButton"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginBottom="14dp"
         android:layout_marginEnd="159dp"
-        android:layout_marginRight="159dp"
         android:layout_marginStart="161dp"
-        android:layout_marginLeft="161dp"
         android:layout_marginTop="16dp"
         app:layout_constraintBottom_toTopOf="@+id/usernameText"
         app:layout_constraintEnd_toEndOf="parent"
