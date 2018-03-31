@@ -1,14 +1,17 @@
 package com.a3008project.test.a3008_haptic;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +20,8 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
+//import android.widget.Toolbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Our primary database to store users
     Database users = new Database();
-    Button bigTapTap, createSequence, loginButton, generatePassword;
+    Button bigTapTap, createSequence, loginButton, generatePassword, aboutButton;
     ImageButton ProfileButton;
     Boolean START_TIMER = false, CREATE_NEW = false;
     Pattern currentInputPattern = new Pattern();
@@ -95,6 +100,12 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private View.OnClickListener AboutButtonListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            AboutButtonClick();
+        }
+    };
 
 
 
@@ -129,6 +140,13 @@ public class MainActivity extends AppCompatActivity {
         // Change username
         ProfileButton = findViewById(R.id.imageButton);
 
+        // Toolbar
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+
+        // About button
+        aboutButton = findViewById(R.id.about_button);
+
         // Generate a username every time the app is launched
         currentUser.generateUserName();
         currentInputPattern.numberOfTaps = 0;
@@ -149,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         createSequence.setOnClickListener(createButtonListener);
         generatePassword.setOnClickListener(GenerateButtonListener);
         bigTapTap.setOnClickListener(BigTapTapListener);
-
+        aboutButton.setOnClickListener(AboutButtonListener);
 
 
         // Create a new user
@@ -337,4 +355,10 @@ public class MainActivity extends AppCompatActivity {
         });
         //------------------------------------------------------------------------------------------
     }
+
+    private void AboutButtonClick() {
+        Toast.makeText(MainActivity.this, "Have not done that yet lol", Toast.LENGTH_SHORT).show();
+        //setContentView(R.layout.about_layout);
+    }
+
 }

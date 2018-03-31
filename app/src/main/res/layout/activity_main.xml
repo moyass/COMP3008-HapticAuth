@@ -2,12 +2,11 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.a3008project.test.a3008_haptic.MainActivity"
     android:background="#FFFF"
-    android:id="@+id/constraintLayout">
-
+    tools:context="com.a3008project.test.a3008_haptic.MainActivity">
 
     <TextView
         android:id="@+id/textView2"
@@ -15,9 +14,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="106dp"
+        android:layout_marginLeft="107dp"
         android:layout_marginRight="107dp"
         android:layout_marginStart="107dp"
-        android:layout_marginLeft="107dp"
         android:fontFamily="sans-serif"
         android:text="@string/tap_in_your_sequence"
         android:textSize="18sp"
@@ -29,7 +28,7 @@
         android:id="@+id/space2"
         android:layout_width="500dp"
         android:layout_height="6dp"
-        android:layout_marginBottom="44dp"
+        android:layout_marginBottom="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -40,7 +39,7 @@
         android:layout_height="12dp"
         android:layout_marginEnd="191dp"
         android:layout_marginStart="193dp"
-        android:layout_marginTop="116dp"
+        android:layout_marginTop="172dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
@@ -126,24 +125,70 @@
         android:layout_marginBottom="4dp"
         android:layout_marginEnd="150dp"
         android:layout_marginStart="150dp"
+        android:layout_marginTop="5dp"
         android:text="@string/username"
         app:layout_constraintBottom_toTopOf="@+id/space"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageButton" />
 
     <ImageButton
         android:id="@+id/imageButton"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginBottom="14dp"
-        android:layout_marginEnd="159dp"
-        android:layout_marginStart="161dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="150dp"
+        android:layout_marginStart="150dp"
+        android:layout_marginTop="30dp"
+        android:contentDescription="@string/todo"
         app:layout_constraintBottom_toTopOf="@+id/usernameText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_launcher" android:contentDescription="@string/todo" />
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
+        app:srcCompat="@mipmap/ic_launcher" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="189dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="52dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="34dp"
+        android:minWidth="10dp"
+        android:spinnerMode="dialog"
+        app:layout_constraintBottom_toTopOf="@+id/generateButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/passwordTypeText"
+        app:layout_constraintTop_toBottomOf="@+id/button1"
+        app:layout_constraintVertical_bias="0.666" />
+
+    <TextView
+        android:id="@+id/passwordTypeText"
+        android:layout_width="65dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="21dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="68dp"
+        android:layout_marginTop="48dp"
+        android:text="@string/category"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/generateButton"
+        app:layout_constraintEnd_toStartOf="@+id/spinner"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button1" />
+
+
+    <include
+        android:id="@+id/my_toolbar"
+        layout="@layout/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        app:layout_constraintBottom_toTopOf="@+id/imageButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </android.support.constraint.ConstraintLayout>

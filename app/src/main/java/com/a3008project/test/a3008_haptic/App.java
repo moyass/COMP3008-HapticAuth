@@ -1,5 +1,6 @@
 package com.a3008project.test.a3008_haptic;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
@@ -16,6 +17,15 @@ public class App extends Application {
 
     public static Context getContext() {
         return getApplication().getApplicationContext();
+    }
+
+    private Activity mCurrentActivity = null;
+
+    public Activity getCurrentActivity(){
+        return mCurrentActivity;
+    }
+    public void setCurrentActivity(Activity mCurrentActivity){
+        this.mCurrentActivity = mCurrentActivity;
     }
 
     @Override
