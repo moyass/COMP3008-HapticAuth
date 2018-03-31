@@ -1,5 +1,7 @@
 package com.a3008project.test.a3008_haptic;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -8,19 +10,17 @@ import java.util.HashMap;
  */
 
 public class Database {
-    // Database that shall hold our shit
 
-    // Store all the users and shit
-    ArrayList<User> users = new ArrayList<>();
+    private int USER_ID_COUNT = 0;
 
     // To be used in a bit
     HashMap<Integer,User> USER_DB = new HashMap<Integer, User>();
 
 
-    public Database (){
-        // Initialize the database
-
+    public void add(User input){
+        USER_DB.put(USER_ID_COUNT, input);
+        Log.d("DEBUG", "USER ADDED "+ USER_ID_COUNT +" "+ input.getUsername());
+        USER_ID_COUNT++;
     }
-
 
 }

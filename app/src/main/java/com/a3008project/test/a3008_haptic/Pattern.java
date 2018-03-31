@@ -1,8 +1,11 @@
 package com.a3008project.test.a3008_haptic;
 
 import android.icu.util.DateInterval;
+import android.os.Vibrator;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by mohamad on 26/03/18.
@@ -12,20 +15,31 @@ public class Pattern {
 
     private ArrayList<Long> RatioList = new ArrayList<>();
     int numberOfTaps = 0;
-
+    private Timer timer = new Timer(5);
 
     Pattern (ArrayList<Long> inputRatios, int inputNumberOfTaps){
         RatioList = inputRatios;
         numberOfTaps = inputNumberOfTaps;
     }
+    Pattern(){
 
-    Pattern (){
+    }
+    Pattern (int donothing){
         Generate();
     }
 
     public void Generate() {
         // In the case a ratio list isn't included, we should by default generate a new pattern
+        Random rand = new Random();
 
+        long interval;
+        int NOT = rand.nextInt(6)+3;
+        numberOfTaps = NOT;
+        for(int i = 0; i < NOT; i++){
+            interval = rand.nextInt(2000) + 100;
+            Log.d ("DEBUG"," interval at " + i + " is " + interval);
+            RatioList.add(interval);
+        }
 
         return;
     }

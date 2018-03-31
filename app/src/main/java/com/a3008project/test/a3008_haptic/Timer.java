@@ -13,6 +13,10 @@ public class Timer {
     private long maxTime;
     private boolean hasTimerStarted = false;
 
+    public Timer (long inputMaxTime){
+        maxTime = inputMaxTime;
+    }
+
     public Timer (TextView text, long inputMaxTime){
         maxTime = inputMaxTime;
         statusText = text;

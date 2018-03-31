@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
@@ -68,12 +69,16 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<User> users = new ArrayList<>();
+    // Our primary database to store users
+    Database users = new Database();
 
     Button bigTapTap, createSequence, loginButton, generatePassword;
+
     ImageButton ProfileButton;
+
     Boolean START_TIMER = false, CREATE_NEW = false;
-    Pattern currentInputPattern;
+    Pattern currentInputPattern = new Pattern();
+    Pattern currentGeneratedPattern = new Pattern();
 
     String selectedCategory = "Nothing";
 
@@ -81,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
     long oldTime, currentTime;
     long currentInterval;
-    long maxTime = (10*1000);
+    long maxTime = (5*1000);
     int  numberOfTaps = 0;
 
 
@@ -139,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Generate a username every time the app is launched
         currentUser.generateUserName();
+        currentInputPattern.numberOfTaps = 0;
 
         // Initialize log file
         logger.writeToFile("",false);
@@ -148,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("DEBUG: User name is "+  currentUser.getUsername());
 
         // Initialize the vibrator
-        vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         stopWatch = new Timer(statusText, maxTime);
 
@@ -173,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                 // TODO Auto-generated method stub
                 Toast.makeText(getBaseContext(), list.get(position), Toast.LENGTH_SHORT).show();
                 selectedCategory = list.get(position);
-                Toast.makeText(getBaseContext(), "Press Generate to generate new password", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), "Press Generate to generate new password", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -182,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Generate Rhythmic Password and Vibrate
         generatePassword.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -190,7 +197,22 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 Toast.makeText(getBaseContext(), "Generating new password.", Toast.LENGTH_SHORT).show();
+                bigTapTap.setEnabled(true);
+                userName.setText(currentUser.getUsername());
 
+                Pattern testPattern = new Pattern(0);
+                ArrayList<Long> temp = testPattern.getRatioList();
+
+                Handler handler = new Handler();
+                for (long element: temp){
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            vibrator.vibrate(50);
+                        }
+                    }, element);
+                }
+
+                currentGeneratedPattern = testPattern;
 
             }
         });
@@ -200,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 statusText.setText("Creating a new sequence!");
+
                 /*
                 CREATE_NEW = true;
                 START_TIMER = true;
@@ -270,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
                  * or user has not tapped the the bigTapTap in 10 seconds
                  *
                  */
-
+                long startTime = System.currentTimeMillis();
                 if (!START_TIMER) {
                     START_TIMER = true;
                     oldTime = System.currentTimeMillis();
@@ -278,16 +301,16 @@ public class MainActivity extends AppCompatActivity {
                     //stopWatch.cT.start();
                     stopWatch.start();
                     //cT.start();
-                    numberOfTaps++;
-                    System.out.println("DEBUG: Intial Tap. NOT = " + numberOfTaps);
+                    currentInputPattern.numberOfTaps++;
+                    System.out.println("DEBUG: Intial Tap. NOT = " + currentInputPattern.numberOfTaps);
 
 
-                } else if (System.currentTimeMillis() - oldTime >= maxTime) {
+                } else if (System.currentTimeMillis() - startTime >= maxTime) {
                     oldTime = 0;
                     currentTime = 0;
                     START_TIMER = false;
                     CREATE_NEW = false;
-                    numberOfTaps = 0;
+                    //numberOfTaps = 0;
 
                     /**
                      * Assuming the user has completed his input
@@ -296,9 +319,19 @@ public class MainActivity extends AppCompatActivity {
 
                     // Create a pattern based on the current input
                     currentInputPattern = new Pattern(intervalsBetweenTaps,numberOfTaps);
-                    currentUser.setPattern(currentInputPattern);
+
+                    Log.d("DEBUG", "Generated number of taps is " + currentGeneratedPattern.numberOfTaps
+                    + " User input number of taps is " + currentInputPattern.numberOfTaps + " \n");
+
+                    currentInputPattern.Compare(currentGeneratedPattern);
+
+                    currentUser.sequences.put(selectedCategory,currentInputPattern);
+
+                    Log.d("DEBUG", "PUT into hashmap " + selectedCategory + ", current interval "+ currentInputPattern);
 
                     logger.writeToFile(currentUser.getUsername(),true);
+
+                    currentInputPattern.numberOfTaps = 0;
 
                     // Add
                     users.add(currentUser);
@@ -307,16 +340,17 @@ public class MainActivity extends AppCompatActivity {
                     intervalsBetweenTaps.clear();
 
                 } else {
-                    numberOfTaps++;
+                    currentInputPattern.numberOfTaps++;
+
                     // It has been tapped at least once so far
                     currentTime = System.currentTimeMillis();
                     currentInterval = currentTime - oldTime;
+                    Log.d("TIME_DEBUG", "Current time " + currentTime + " old time "+ oldTime + " = " + currentInterval);
                     intervalsBetweenTaps.add(currentInterval);
-                    System.out.println("DEBUG: Current Interval " + (currentInterval) + " NOT = "+numberOfTaps);
+                    oldTime = currentTime;
+                    System.out.println("DEBUG: Current Interval " + (currentInterval) + " NOT = "+currentInputPattern.numberOfTaps);
 
                 }
-
-
 
             }
         });
