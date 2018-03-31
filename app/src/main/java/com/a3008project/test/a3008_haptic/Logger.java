@@ -50,7 +50,8 @@ public class Logger {
 
 
     public Logger (){
-
+        InitializeFile();
+        writeToFile("",false);
     }
 
     // Default constructor to specify only the file name.

@@ -16,8 +16,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +31,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DOCUMENTATION FOR VIBRATION
@@ -66,20 +70,22 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<User> users = new ArrayList<>();
 
-    Button bigTapTap, createSequence, loginButton;
+    Button bigTapTap, createSequence, loginButton, generatePassword;
     ImageButton ProfileButton;
     Boolean START_TIMER = false, CREATE_NEW = false;
     Pattern currentInputPattern;
+
+    String selectedCategory = "Nothing";
 
     User currentUser = new User();
 
     long oldTime, currentTime;
     long currentInterval;
-    int numberOfTaps = 0;
-
-    Logger logger = new Logger("userdata.txt");
-
     long maxTime = (10*1000);
+    int  numberOfTaps = 0;
+
+
+    Logger logger = new Logger();
 
 
     TextView statusText, userName;
@@ -115,6 +121,9 @@ public class MainActivity extends AppCompatActivity {
         // Create a sequence
         createSequence = findViewById(R.id.createButton);
 
+        // Generate a sequence
+        generatePassword = findViewById(R.id.generateButton);
+
         // Login using a sequence you created earlier
         loginButton = findViewById(R.id.loginButton);
 
@@ -131,43 +140,67 @@ public class MainActivity extends AppCompatActivity {
         // Generate a username every time the app is launched
         currentUser.generateUserName();
 
+        // Initialize log file
         logger.writeToFile("",false);
 
         // Set the initial username since the app has started
         userName.setText(currentUser.getUsername());
         System.out.println("DEBUG: User name is "+  currentUser.getUsername());
 
-        logger.writeToFile("HI... DO YOU KNOW DE WEI? \n",true);
-
         // Initialize the vibrator
         vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 
         stopWatch = new Timer(statusText, maxTime);
 
-        final CountDownTimer cT =  new CountDownTimer(maxTime, 1000) {
+        final List<String> list = new ArrayList<String>();
+        list.add("Bank");
+        list.add("Email");
+        list.add("Shopping");
+        list.add("Social");
+        list.add("Other");
 
-            public void onTick(long millisUntilFinished) {
-                //hasTimerStarted = true;
-                String v = String.format("%02d", millisUntilFinished / 60000);
-                int va = (int) ((millisUntilFinished % 60000) / 1000);
-                statusText.setText("seconds remaining: " + v + ":" + String.format("%02d", va));
+        final Spinner sp1 = (Spinner) findViewById(R.id.spinner);
+
+        ArrayAdapter<String> adp1 = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, list);
+        adp1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sp1.setAdapter(adp1);
+
+        sp1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
+                // TODO Auto-generated method stub
+                Toast.makeText(getBaseContext(), list.get(position), Toast.LENGTH_SHORT).show();
+                selectedCategory = list.get(position);
+                Toast.makeText(getBaseContext(), "Press Generate to generate new password", Toast.LENGTH_LONG).show();
             }
 
-            public void onFinish() {
-                //hasTimerStarted = false;
-                statusText.setText("Press one more time to confirm input");
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        generatePassword.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if(selectedCategory == "Nothing") {
+                    Toast.makeText(getBaseContext(), "NO CATEGORY IS SELECTED", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Toast.makeText(getBaseContext(), "Generating new password.", Toast.LENGTH_SHORT).show();
+
 
             }
-        };
-
-
+        });
 
         // Create button
         createSequence.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 statusText.setText("Creating a new sequence!");
-
+                /*
                 CREATE_NEW = true;
                 START_TIMER = true;
 
@@ -175,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
                 bigTapTap.setEnabled(true);
                 logger.Set(DataEnum.USER_ID, currentUser.getUsername());
                 logger.writeToFile(currentUser.getUsername(),true);
+                */
 
             }
         });
@@ -194,8 +228,8 @@ public class MainActivity extends AppCompatActivity {
                             currentUser = new User();
                             userName.setText(currentUser.getUsername());
                             logger.Set(DataEnum.USER_ID, currentUser.getUsername());
-                            //stopWatch.cT.cancel();
-                            cT.cancel();
+                            stopWatch.start();
+                            //cT.cancel();
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
                             System.out.println("DEBUG: Canceled the making of a new user.");
@@ -242,8 +276,8 @@ public class MainActivity extends AppCompatActivity {
                     oldTime = System.currentTimeMillis();
 
                     //stopWatch.cT.start();
-                    //stopWatch.start();
-                    cT.start();
+                    stopWatch.start();
+                    //cT.start();
                     numberOfTaps++;
                     System.out.println("DEBUG: Intial Tap. NOT = " + numberOfTaps);
 

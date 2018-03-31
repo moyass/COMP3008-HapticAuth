@@ -33,6 +33,8 @@ public class Pattern {
     public ArrayList<Long> getRatioList() {
         return RatioList;
     }
+
+
     public boolean Compare(Pattern input) {
         // Compare two patterns and see if they are similar
         // In the case someone types in their pattern slower
@@ -55,7 +57,7 @@ public class Pattern {
 
         // Compare local values with input.
         for (int i = 0; i < size; i++){
-            differencesBetweenintervals[i] = (input.getRatioList().get(i) - RatioList.get(i));
+            differencesBetweenintervals[i] = (input.getRatioList().get(i) / RatioList.get(i));
         }
 
         // Subtract all the values

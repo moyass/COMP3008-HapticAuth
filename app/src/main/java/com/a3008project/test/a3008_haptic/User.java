@@ -12,9 +12,10 @@ public class User {
     private String  username = null;
 
     // Using hashmap to store "shopping" and it's pattern
-    private HashMap<String,Pattern> sequences = new HashMap();
+    public HashMap<String,Pattern> sequences = new HashMap();
 
     private Pattern sequence = new Pattern(); // generate a password
+
     private int usernameLength = 7;
 
     public User () {
