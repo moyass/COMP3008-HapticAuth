@@ -51,6 +51,7 @@ public class Pattern {
 
 
     public boolean Compare(Pattern input) {
+        // TODO: FIX ALGO
         // Compare two patterns and see if they are similar
         // In the case someone types in their pattern slower
         // sample: 940,1287,3312,3671,4797,5698,5999

@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
     long oldTime, currentTime;
     long currentInterval;
     long maxTime = (5*1000);
-    int  numberOfTaps = 0;
     Logger logger = new Logger();
     TextView statusText, userName;
     ArrayList<Long> intervalsBetweenTaps = new ArrayList<>();
@@ -96,38 +95,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void PopulateDropDownMenu(){
-        //------------------------------------------------------------------------------------------
-        final List<String> list = new ArrayList<String>();
-        list.add("Bank");
-        list.add("Email");
-        list.add("Shopping");
-        list.add("Social");
-        list.add("Other");
 
-        final Spinner sp1 = (Spinner) findViewById(R.id.spinner);
-
-        ArrayAdapter<String> adp1 = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, list);
-        adp1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sp1.setAdapter(adp1);
-
-        sp1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
-                // TODO Auto-generated method stub
-                Toast.makeText(getBaseContext(), list.get(position), Toast.LENGTH_SHORT).show();
-                selectedCategory = list.get(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
-            }
-        });
-        //------------------------------------------------------------------------------------------
-    }
 
 
     @Override
@@ -166,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         currentInputPattern.numberOfTaps = 0;
 
         // Initialize log file
-        logger.writeToFile("",false);
+        logger.writeToFile(false);
 
         // Set the initial username since the app has started
         userName.setText(currentUser.getUsername());
@@ -221,8 +189,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
     }
 
     private void GenerateButtonClicked() {
@@ -233,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getBaseContext(), "Generating new password.", Toast.LENGTH_SHORT).show();
         bigTapTap.setEnabled(true);
         userName.setText(currentUser.getUsername());
+
 
         Pattern testPattern = new Pattern(0);
 
@@ -248,6 +215,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         currentGeneratedPattern = testPattern;
+        logger.Set(DataEnum.USER_ID, currentUser.getUsername());
+
     }
 
     private void BigTapTapTapped() {
@@ -296,11 +265,11 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void EndOfTime(){
+        String result = "failed";
         oldTime = 0;
         currentTime = 0;
         START_TIMER = false;
         CREATE_NEW = false;
-        //numberOfTaps = 0;
 
         /**
          * Assuming the user has completed his input
@@ -313,13 +282,19 @@ public class MainActivity extends AppCompatActivity {
         Log.d("DEBUG", "Generated number of taps is " + currentGeneratedPattern.numberOfTaps
                 + " User input number of taps is " + currentInputPattern.numberOfTaps + " \n");
 
-        currentInputPattern.Compare(currentGeneratedPattern);
+        if(currentInputPattern.Compare(currentGeneratedPattern)) {
+            result = "success";
+        }
 
         currentUser.sequences.put(selectedCategory,currentInputPattern);
 
-        Log.d("DEBUG", "PUT into hashmap " + selectedCategory + ", current interval "+ currentInputPattern);
+        Log.d("DEBUG", "PUT into hash map " + selectedCategory
+                + ", current interval "+ currentInputPattern);
 
-        logger.writeToFile(currentUser.getUsername(),true);
+        logger.Set(DataEnum.RESULT, result);
+        logger.Set(DataEnum.SEQUENCE, currentInputPattern.getRatioList().toString());
+
+        logger.writeToFile(true);
 
         currentInputPattern.numberOfTaps = 0;
 
@@ -330,4 +305,36 @@ public class MainActivity extends AppCompatActivity {
         intervalsBetweenTaps.clear();
     }
 
+    private void PopulateDropDownMenu(){
+        //------------------------------------------------------------------------------------------
+        final List<String> list = new ArrayList<String>();
+        list.add("Bank");
+        list.add("Email");
+        list.add("Shopping");
+        list.add("Social");
+        list.add("Other");
+
+        final Spinner sp1 = (Spinner) findViewById(R.id.spinner);
+
+        ArrayAdapter<String> adp1 = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, list);
+        adp1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sp1.setAdapter(adp1);
+
+        sp1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
+                // TODO Auto-generated method stub
+                Toast.makeText(getBaseContext(), list.get(position), Toast.LENGTH_SHORT).show();
+                selectedCategory = list.get(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
+        //------------------------------------------------------------------------------------------
+    }
 }

@@ -46,19 +46,20 @@ public class Logger {
                     mode        = "N/A",
                     event       = "N/A",
                     result      = "N/A",
-                    cookie      = "N/A";
+                    cookie      = "N/A",
+                    sequence    = "N/A";
 
 
     public Logger (){
         InitializeFile();
-        writeToFile("",false);
+        writeToFile(false);
     }
 
     // Default constructor to specify only the file name.
     public Logger (String input){
         fileName = input;
         InitializeFile();
-        writeToFile("",false);
+        writeToFile(false);
     }
 
     public void Set (DataEnum dataEnum, String data){
@@ -84,8 +85,12 @@ public class Logger {
             case COOKIE:
                 cookie = data;
                 break;
+            case SEQUENCE:
+                sequence = data;
+                break;
         }
     }
+
     private void InitializeFile(){
         int count = 0;
         boolean something = false;
@@ -113,18 +118,21 @@ public class Logger {
         }
     }
 
-    public void writeToFile (String data, boolean append){
+    public void writeToFile (boolean append){
+        String data = null;
 
-        //userID = data;
+        // Get latest date
         date = new Date();
+
         data = dateFormat.format(date) + ","
-                + userID + ","
-                + environment + ","
-                + scheme + ","
-                + mode + ","
-                + event + ","
-                + result + ","
-                + cookie + "\n";
+                + userID        + ","
+                + environment   + ","
+                + scheme        + ","
+                + mode          + ","
+                + event         + ","
+                + result        + ","
+                + cookie        + ","
+                + sequence      + "\n";
 
         try  {
             FileOutputStream fOut = new FileOutputStream(newFile, append);
@@ -133,7 +141,7 @@ public class Logger {
             outputWriter.close();
 
             //display file saved message
-            Toast.makeText(App.getContext(), "File saved successfully!",
+            Toast.makeText(App.getContext(), "File Updated!",
                     Toast.LENGTH_SHORT).show();
         }catch (Exception e){
             e.printStackTrace();
