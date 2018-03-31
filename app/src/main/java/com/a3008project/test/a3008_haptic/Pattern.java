@@ -33,10 +33,11 @@ public class Pattern {
         Random rand = new Random();
 
         long interval;
-        int NOT = rand.nextInt(6)+3;
+        int NOT = rand.nextInt(5);
         numberOfTaps = NOT;
-        for(int i = 0; i < NOT; i++){
-            interval = rand.nextInt(2000) + 100;
+        for(int i = 1; i <= NOT; i++){
+            //interval = rand.nextInt(2000) + 100;
+            interval = 1000;
             Log.d ("DEBUG"," interval at " + i + " is " + interval);
             RatioList.add(interval);
         }
@@ -53,8 +54,6 @@ public class Pattern {
         // Compare two patterns and see if they are similar
         // In the case someone types in their pattern slower
         // sample: 940,1287,3312,3671,4797,5698,5999
-
-
 
 
         if(input.getRatioList().size() != RatioList.size()){
@@ -78,7 +77,6 @@ public class Pattern {
         for (int i = 0; i < size; i++){
             result = differencesBetweenintervals[0] - differencesBetweenintervals[i];
         }
-
 
         // To be removed
         System.out.println("DEBUG: Result of comparing the patterns " + result);
