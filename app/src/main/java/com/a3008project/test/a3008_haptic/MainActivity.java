@@ -5,6 +5,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -16,6 +19,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -64,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     // Our primary database to store users
     Database users = new Database();
     Button bigTapTap, createSequence, loginButton, generatePassword, aboutButton;
+    CheckBox satView, satView2;
+    boolean checkBoxChecked = false;
+    boolean dynamicTone = false;
     ImageButton ProfileButton;
     Boolean START_TIMER = false, CREATE_NEW = false;
     Pattern currentInputPattern = new Pattern();
@@ -147,6 +155,11 @@ public class MainActivity extends AppCompatActivity {
         // About button
         aboutButton = findViewById(R.id.about_button);
 
+        // Checkbox
+        satView = findViewById(R.id.checkBox);
+        //satView2 = findViewById(R.id.checkBox2);
+
+
         // Generate a username every time the app is launched
         currentUser.generateUserName();
         currentInputPattern.numberOfTaps = 0;
@@ -168,6 +181,33 @@ public class MainActivity extends AppCompatActivity {
         generatePassword.setOnClickListener(GenerateButtonListener);
         bigTapTap.setOnClickListener(BigTapTapListener);
         aboutButton.setOnClickListener(AboutButtonListener);
+
+
+        satView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                if(satView.isChecked()){
+                    checkBoxChecked = true;
+                }else{
+                    checkBoxChecked = false;
+                }
+            }
+        });
+        /*
+        satView2.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                if(satView.isChecked()){
+                    //dynamicTone = true;
+                }else{
+                    //dynamicTone = false;
+                }
+            }
+        });*/
 
 
         // Create a new user
@@ -214,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getBaseContext(), "NO CATEGORY IS SELECTED", Toast.LENGTH_SHORT).show();
             return;
         }
+        statusText.setText("");
         Toast.makeText(getBaseContext(), "Generating new password.", Toast.LENGTH_SHORT).show();
         bigTapTap.setEnabled(true);
         userName.setText(currentUser.getUsername());
@@ -224,10 +265,12 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Long> temp = testPattern.getRatioList();
 
         Handler handler = new Handler();
-        for (long element: temp){
+        for (final long element: temp){
             handler.postDelayed(new Runnable() {
                 public void run() {
                     vibrator.vibrate(50);
+                    if (checkBoxChecked) playTone(element,0.20);
+
                 }
             }, element);
         }
@@ -239,16 +282,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void BigTapTapTapped() {
         // Vibrate the phone for some haptic feedback for the user
-        vibrator.vibrate(20);
 
         if (!START_TIMER) {
             START_TIMER = true;
             oldTime = System.currentTimeMillis();
             cT.start();
-            currentInputPattern.numberOfTaps++;
+
+
+            // We don't care about the first tap as it is just to initiate the tapping input
+            //currentInputPattern.numberOfTaps++;
+
             System.out.println("DEBUG: Intial Tap. NOT = " + currentInputPattern.numberOfTaps);
 
         } else {
+            if (checkBoxChecked) playTone(currentInterval,0.20);
+            vibrator.vibrate(20);
             currentInputPattern.numberOfTaps++;
 
             // It has been tapped at least once so far
@@ -276,7 +324,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void onFinish() {
-            statusText.setText("Press one more time to confirm input");
+            statusText.setText("");
+            bigTapTap.setEnabled(false);
             EndOfTime();
 
         }
@@ -302,6 +351,9 @@ public class MainActivity extends AppCompatActivity {
 
         if(currentInputPattern.Compare(currentGeneratedPattern)) {
             result = "success";
+            statusText.setText("Success!!");
+        } else {
+            statusText.setText("WHO DIS?!?!");
         }
 
         currentUser.sequences.put(selectedCategory,currentInputPattern);
@@ -359,6 +411,75 @@ public class MainActivity extends AppCompatActivity {
     private void AboutButtonClick() {
         Toast.makeText(MainActivity.this, "Have not done that yet lol", Toast.LENGTH_SHORT).show();
         //setContentView(R.layout.about_layout);
+    }
+
+    public void playTone(double freqOfTone, double duration) {
+        //double duration = 1000;                // seconds
+        //   double freqOfTone = 1000;           // hz
+        int sampleRate = 4800;              // a number
+
+        double dnumSamples = duration * sampleRate;
+        dnumSamples = Math.ceil(dnumSamples);
+        int numSamples = (int) dnumSamples;
+        double sample[] = new double[numSamples];
+        byte generatedSnd[] = new byte[2 * numSamples];
+
+
+        for (int i = 0; i < numSamples; ++i) {      // Fill the sample array
+            sample[i] = Math.sin(freqOfTone * 2 * Math.PI * i / (sampleRate));
+        }
+
+        // convert to 16 bit pcm sound array
+        // assumes the sample buffer is normalized.
+        // convert to 16 bit pcm sound array
+        // assumes the sample buffer is normalised.
+        int idx = 0;
+        int i = 0 ;
+
+        int ramp = numSamples / 20 ;                                    // Amplitude ramp as a percent of sample count
+
+
+        for (i = 0; i< ramp; ++i) {                                     // Ramp amplitude up (to avoid clicks)
+            double dVal = sample[i];
+            // Ramp up to maximum
+            final short val = (short) ((dVal * 32767 * i/ramp));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+        }
+
+
+        for (i = i; i< numSamples - ramp; ++i) {                        // Max amplitude for most of the samples
+            double dVal = sample[i];
+            // scale to maximum amplitude
+            final short val = (short) ((dVal * 32767));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+        }
+
+        for (i = i; i< numSamples; ++i) {                               // Ramp amplitude down
+            double dVal = sample[i];
+            // Ramp down to zero
+            final short val = (short) ((dVal * 32767 * (numSamples-i)/ramp ));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+        }
+
+        AudioTrack audioTrack = null;                                   // Get audio track
+        try {
+            int bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                    sampleRate, AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT, bufferSize,
+                    AudioTrack.MODE_STREAM);
+            audioTrack.play();                                          // Play the track
+            audioTrack.write(generatedSnd, 0, generatedSnd.length);     // Load the track
+        }
+        catch (Exception e){
+        }
+        if (audioTrack != null) audioTrack.release();           // Track play done. Release track.
     }
 
 }

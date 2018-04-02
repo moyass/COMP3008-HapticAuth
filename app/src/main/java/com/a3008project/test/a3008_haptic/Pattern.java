@@ -16,20 +16,19 @@ public class Pattern {
     private Timer timer = new Timer(5);
 
     // DISCUS WITH THE REST OF THE GROUP
-    private int UpperGenerateBound = 3;
-    private int LowerGenerateBound = 1;
-    private int UpperIntervalBound      = 2000;
-    private int LowerIntervalBound      = 500;
-
+    public int UpperGenerateBound = 5;
+    public int LowerGenerateBound = 2;
+    public int UpperIntervalBound = 1000;
+    public int LowerIntervalBound = 200;
 
 
     Pattern (ArrayList<Long> inputRatios, int inputNumberOfTaps){
         RatioList = inputRatios;
         numberOfTaps = inputNumberOfTaps;
     }
-    Pattern(){
 
-    }
+    Pattern(){}
+
     Pattern (int donothing){
         Generate();
     }
@@ -89,7 +88,12 @@ public class Pattern {
         // To be removed
         System.out.println("DEBUG: Result of comparing the patterns " + result);
 
+        if (result == 0){
+            Log.d("COMPARE RESULT", "Success");
+            return true;
+        }
 
+        Log.d("COMPARE RESULT", "Failed");
         return false;
     }
 }
