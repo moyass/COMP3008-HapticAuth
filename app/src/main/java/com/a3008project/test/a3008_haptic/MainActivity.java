@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
         statusText.setText("");
         Toast.makeText(getBaseContext(), "Generating new password.", Toast.LENGTH_SHORT).show();
         bigTapTap.setEnabled(true);
-        bigTapTap.setBackgroundColor(Color.GREEN);
+        bigTapTap.setBackgroundColor(getResources().getColor(R.color.colorAccent));
         userName.setText(currentUser.getUsername());
 
 
@@ -332,8 +332,6 @@ public class MainActivity extends AppCompatActivity {
 
         public void onFinish() {
             statusText.setText("");
-
-
                 bigTapTap.setEnabled(false);
                 bigTapTap.setBackgroundColor(Color.LTGRAY);
                 EndOfTime();
