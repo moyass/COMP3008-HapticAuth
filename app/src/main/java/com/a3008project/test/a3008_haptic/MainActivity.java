@@ -71,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
     Button bigTapTap, createSequence, loginButton, generatePassword, aboutButton;
     CheckBox satView, satView2;
     boolean checkBoxChecked = false;
-    boolean dynamicTone = false;
     ImageButton ProfileButton;
     Boolean START_TIMER = false, CREATE_NEW = false;
     Pattern currentInputPattern = new Pattern();
@@ -85,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
     TextView statusText, userName;
     ArrayList<Long> intervalsBetweenTaps = new ArrayList<>();
     Vibrator vibrator;
+
+    int numberOfAttempts = 0;
 
 
     private View.OnClickListener createButtonListener = new View.OnClickListener() {
@@ -195,19 +196,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        /*
-        satView2.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                if(satView.isChecked()){
-                    //dynamicTone = true;
-                }else{
-                    //dynamicTone = false;
-                }
-            }
-        });*/
 
 
         // Create a new user
@@ -266,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < temp.size(); i++) {
             vibrator.vibrate(20);
-            playTone(500, 0.20);
+            if(checkBoxChecked) playTone(500, 0.20);
             try {
                 Thread.sleep(temp.get(i));
             } catch (Exception e) {
@@ -274,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         vibrator.vibrate(20);
-        playTone(500, 0.20);
+        if(checkBoxChecked) playTone(500, 0.20);
 
         currentGeneratedPattern = testPattern;
         logger.Set(DataEnum.USER_ID, currentUser.getUsername());
@@ -310,14 +298,18 @@ public class MainActivity extends AppCompatActivity {
             if(currentInputPattern.numberOfTaps > 1) {
                 currentInterval = currentTime - oldTime;
                 intervalsBetweenTaps.add(currentInterval);
-                Log.d("NOOO", "Size of the interval list " + intervalsBetweenTaps.size() +" current time " + currentTime + "  old " + oldTime + " currentInterval " + currentInterval);
+                Log.d("NOOO", "Size of the interval list " + intervalsBetweenTaps.size()
+                        +" current time " + currentTime + "  old " + oldTime
+                        + " currentInterval " + currentInterval);
             }
 
-            Log.d("TIME_DEBUG", "Current time " + currentTime + " old time "+ oldTime + " = " + currentInterval);
+            Log.d("TIME_DEBUG", "Current time " + currentTime + " old time "+ oldTime
+                    + " = " + currentInterval);
 
 
             oldTime = currentTime;
-            System.out.println("DEBUG: Current Interval " + (currentInterval) + " NOT = "+ currentInputPattern.numberOfTaps);
+            System.out.println("DEBUG: Current Interval " + (currentInterval) + " NOT = "
+                    + currentInputPattern.numberOfTaps);
 
         }
     }
@@ -337,8 +329,11 @@ public class MainActivity extends AppCompatActivity {
 
         public void onFinish() {
             statusText.setText("");
-            bigTapTap.setEnabled(false);
-            EndOfTime();
+
+
+                bigTapTap.setEnabled(false);
+                EndOfTime();
+
 
         }
     };
@@ -365,7 +360,14 @@ public class MainActivity extends AppCompatActivity {
             result = "success";
             statusText.setText("Success!!");
         } else {
-            statusText.setText("WHO DIS?!?!");
+            numberOfAttempts++;
+            statusText.setText("Failed. Attempt #" + numberOfAttempts);
+        }
+
+        if(numberOfAttempts < 4) {
+            bigTapTap.setEnabled(true);
+            currentInputPattern = new Pattern();
+            return;
         }
 
         currentUser.sequences.put(selectedCategory,currentInputPattern);
@@ -385,9 +387,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Clear
         intervalsBetweenTaps.clear();
+        currentInputPattern = new Pattern();
+        numberOfAttempts = 0;
     }
 
     private void PopulateDropDownMenu(){
+
         //------------------------------------------------------------------------------------------
         final List<String> list = new ArrayList<String>();
         list.add("Bank");
