@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     User currentUser = new User();
     long oldTime, currentTime;
     long currentInterval;
-    long maxTime = (5*1000);
+    long maxTime = (10*1000);
     Logger logger = new Logger();
     TextView statusText, userName;
     ArrayList<Long> intervalsBetweenTaps = new ArrayList<>();
@@ -264,16 +264,17 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayList<Long> temp = testPattern.getRatioList();
 
-        Handler handler = new Handler();
-        for (final long element: temp){
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    vibrator.vibrate(50);
-                    if (checkBoxChecked) playTone(element,0.20);
-
-                }
-            }, element);
+        for (int i = 0; i < temp.size(); i++) {
+            vibrator.vibrate(20);
+            playTone(500, 0.20);
+            try {
+                Thread.sleep(temp.get(i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        vibrator.vibrate(20);
+        playTone(500, 0.20);
 
         currentGeneratedPattern = testPattern;
         logger.Set(DataEnum.USER_ID, currentUser.getUsername());
@@ -285,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (!START_TIMER) {
             START_TIMER = true;
-            oldTime = System.currentTimeMillis();
+            //oldTime = System.currentTimeMillis();
             cT.start();
 
 
@@ -295,15 +296,26 @@ public class MainActivity extends AppCompatActivity {
             System.out.println("DEBUG: Intial Tap. NOT = " + currentInputPattern.numberOfTaps);
 
         } else {
-            if (checkBoxChecked) playTone(currentInterval,0.20);
+            //oldTime = System.currentTimeMillis();
+            if (checkBoxChecked) playTone(500,0.20);
             vibrator.vibrate(20);
+
+
             currentInputPattern.numberOfTaps++;
 
             // It has been tapped at least once so far
             currentTime = System.currentTimeMillis();
-            currentInterval = currentTime - oldTime;
+
+
+            if(currentInputPattern.numberOfTaps > 1) {
+                currentInterval = currentTime - oldTime;
+                intervalsBetweenTaps.add(currentInterval);
+                Log.d("NOOO", "Size of the interval list " + intervalsBetweenTaps.size() +" current time " + currentTime + "  old " + oldTime + " currentInterval " + currentInterval);
+            }
+
             Log.d("TIME_DEBUG", "Current time " + currentTime + " old time "+ oldTime + " = " + currentInterval);
-            intervalsBetweenTaps.add(currentInterval);
+
+
             oldTime = currentTime;
             System.out.println("DEBUG: Current Interval " + (currentInterval) + " NOT = "+ currentInputPattern.numberOfTaps);
 

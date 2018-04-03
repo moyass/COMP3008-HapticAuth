@@ -16,10 +16,12 @@ public class Pattern {
     private Timer timer = new Timer(5);
 
     // DISCUS WITH THE REST OF THE GROUP
-    public int UpperGenerateBound = 5;
-    public int LowerGenerateBound = 2;
+    public int UpperGenerateBound = 6;
+    public int LowerGenerateBound = 4;
     public int UpperIntervalBound = 1000;
     public int LowerIntervalBound = 200;
+
+    double marginOfError = 0.35;
 
 
     Pattern (ArrayList<Long> inputRatios, int inputNumberOfTaps){
@@ -38,11 +40,12 @@ public class Pattern {
         Random rand = new Random();
 
         long interval;
-        int NOT = rand.nextInt(UpperGenerateBound) + LowerGenerateBound;
+        int NOT = rand.nextInt(UpperGenerateBound - LowerGenerateBound) + LowerGenerateBound;
+
         numberOfTaps = NOT;
-        for(int i = 1; i <= NOT; i++){
-            interval = rand.nextInt(UpperIntervalBound) + LowerIntervalBound;
-            Log.d ("DEBUG"," interval at " + i + " is " + interval);
+        for(int i = 2; i <= NOT; i++){
+            interval = rand.nextInt(UpperIntervalBound - LowerIntervalBound) + LowerIntervalBound;
+            Log.d ("DEBUG"," interval at " + (i - 1) + " is " + interval);
 
 
             RatioList.add(interval);
@@ -62,38 +65,36 @@ public class Pattern {
         // In the case someone types in their pattern slower
         // sample: 940,1287,3312,3671,4797,5698,5999
 
+        // Store it locally so we don't need to access multiple methods to get the value
+
+        int size = RatioList.size();
 
         if(input.getRatioList().size() != RatioList.size()){
             System.out.println("DEBUG: The input ratio list is not the same. [DIFF SIZES]");
             return false;
         }
 
-        // Store it locally so we don't need to access multiple methods to get the value
-        int size = RatioList.size();
+
 
         // Store values for differences between local and comparative values
-        long differencesBetweenintervals[] = new long [size];
-        long result = -1;
+        double ratiosBetweenintervals[] = new double [size];
+        double result = -1;
 
         // Compare local values with input.
         for (int i = 0; i < size; i++){
-            differencesBetweenintervals[i] = (input.getRatioList().get(i) / RatioList.get(i));
+            ratiosBetweenintervals[i] = (double) input.getRatioList().get(i) / (double) RatioList.get(i);
+            Log.d("DEBUG","\nGenerated : " + input.getRatioList().get(i) + " \nUser " + RatioList.get(i) + " Diff: "+ ratiosBetweenintervals[i]);
         }
 
-        // Subtract all the values
+        // Compare all the values
+        double controlRatio = ratiosBetweenintervals[0];
         for (int i = 0; i < size; i++){
-            result = differencesBetweenintervals[0] - differencesBetweenintervals[i];
+            if ((Math.abs(ratiosBetweenintervals[i] - controlRatio) > marginOfError)) {
+                Log.d("COMPARE RESULT", "Failed");
+                return false;
+            }
         }
-
-        // To be removed
-        System.out.println("DEBUG: Result of comparing the patterns " + result);
-
-        if (result == 0){
-            Log.d("COMPARE RESULT", "Success");
-            return true;
-        }
-
-        Log.d("COMPARE RESULT", "Failed");
-        return false;
+        Log.d("COMPARE RESULT", "Success");
+        return true;
     }
 }
