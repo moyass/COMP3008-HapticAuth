@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -129,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
         // Collect the elements from the activity and store them into objects
         bigTapTap = findViewById(R.id.button1);
         bigTapTap.setEnabled(false);
+        bigTapTap.setBackgroundColor(Color.LTGRAY);
 
         // Create a sequence
         createSequence = findViewById(R.id.createButton);
@@ -245,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
         statusText.setText("");
         Toast.makeText(getBaseContext(), "Generating new password.", Toast.LENGTH_SHORT).show();
         bigTapTap.setEnabled(true);
+        bigTapTap.setBackgroundColor(Color.GREEN);
         userName.setText(currentUser.getUsername());
 
 
@@ -332,6 +335,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 bigTapTap.setEnabled(false);
+                bigTapTap.setBackgroundColor(Color.LTGRAY);
                 EndOfTime();
 
 
@@ -366,6 +370,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(numberOfAttempts < 4) {
             bigTapTap.setEnabled(true);
+            bigTapTap.setBackgroundColor(getResources().getColor(R.color.colorAccent));
             currentInputPattern = new Pattern();
             return;
         }
