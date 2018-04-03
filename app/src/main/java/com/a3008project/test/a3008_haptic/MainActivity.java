@@ -12,6 +12,7 @@ import android.media.AudioTrack;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -80,12 +81,13 @@ public class MainActivity extends AppCompatActivity {
     User currentUser = new User();
     long oldTime, currentTime;
     long currentInterval;
-    long maxTime = (10*1000);
+    long maxTime = (7*1000);
     Logger logger = new Logger();
-    TextView statusText, userName;
+    TextView statusText, userName, attemptText;
     ArrayList<Long> intervalsBetweenTaps = new ArrayList<>();
     Vibrator vibrator;
 
+    Pattern testPattern;
     int numberOfAttempts = 0;
 
 
@@ -145,6 +147,10 @@ public class MainActivity extends AppCompatActivity {
         statusText = findViewById(R.id.countDown);
         statusText.setText("");
 
+        // Attempt Text
+        attemptText = findViewById(R.id.attemptText);
+        attemptText.setText("");
+
         // Username text object
         userName = findViewById(R.id.usernameText);
 
@@ -165,10 +171,16 @@ public class MainActivity extends AppCompatActivity {
 
         // Generate a username every time the app is launched
         currentUser.generateUserName();
+        logger.Set(DataEnum.USER_ID, currentUser.getUsername());
+
         currentInputPattern.numberOfTaps = 0;
 
         // Initialize log file
-        logger.writeToFile(false);
+        //logger.writeToFile(false);
+        logger.Reset();
+        logger.Set(DataEnum.ENVIRONMENT, "android");
+        logger.Set(DataEnum.SCHEME, "rhythm");
+        logger.Set(DataEnum.EVENT, "register");
 
         // Set the initial username since the app has started
         userName.setText(currentUser.getUsername());
@@ -187,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         satView.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
@@ -210,11 +221,10 @@ public class MainActivity extends AppCompatActivity {
                         case DialogInterface.BUTTON_POSITIVE:
                             System.out.println("DEBUG: Creating a new user. Resetting all fields");
                             CREATE_NEW = true;
-                            START_TIMER = true;
-                            currentUser = new User();
+                            //currentUser = new User();
                             userName.setText(currentUser.getUsername());
                             logger.Set(DataEnum.USER_ID, currentUser.getUsername());
-                            cT.cancel();
+                            //EndOfTime();
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
                             System.out.println("DEBUG: Canceled the making of a new user.");
@@ -240,18 +250,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void GenerateButtonClicked() {
+
         if(selectedCategory == "Nothing") {
             Toast.makeText(getBaseContext(), "NO CATEGORY IS SELECTED", Toast.LENGTH_SHORT).show();
             return;
         }
+
         statusText.setText("");
         Toast.makeText(getBaseContext(), "Generating new password.", Toast.LENGTH_SHORT).show();
         bigTapTap.setEnabled(true);
         bigTapTap.setBackgroundColor(getResources().getColor(R.color.colorAccent));
         userName.setText(currentUser.getUsername());
+        numberOfAttempts = 0;
+
+        attemptText.setText("");
 
 
-        Pattern testPattern = new Pattern(0);
+        testPattern = new Pattern(0);
 
         ArrayList<Long> temp = testPattern.getRatioList();
 
@@ -264,29 +279,37 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
         vibrator.vibrate(20);
         if(checkBoxChecked) playTone(500, 0.20);
 
         currentGeneratedPattern = testPattern;
-        logger.Set(DataEnum.USER_ID, currentUser.getUsername());
+
+        // Logger CSV File
+        logger.Set(DataEnum.MODE, "generate");
+        logger.Set(DataEnum.CATEGORY, selectedCategory);
 
     }
 
     private void BigTapTapTapped() {
         // Vibrate the phone for some haptic feedback for the user
-
+        /*
         if (!START_TIMER) {
             START_TIMER = true;
             //oldTime = System.currentTimeMillis();
             cT.start();
-
 
             // We don't care about the first tap as it is just to initiate the tapping input
             //currentInputPattern.numberOfTaps++;
 
             System.out.println("DEBUG: Intial Tap. NOT = " + currentInputPattern.numberOfTaps);
 
-        } else {
+        }*/
+
+        {
+            if (currentInputPattern.numberOfTaps == 0){
+                cT.start();
+            }
             //oldTime = System.currentTimeMillis();
             if (checkBoxChecked) playTone(500,0.20);
             vibrator.vibrate(20);
@@ -318,7 +341,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void CreateButtonClicked (){
-        Log.d ("BOI", "BOI");
+
+        ArrayList<Long> temp = testPattern.getRatioList();
+
+        for (int i = 0; i < temp.size(); i++) {
+            vibrator.vibrate(20);
+            if(checkBoxChecked) playTone(500, 0.20);
+            try {
+                Thread.sleep(temp.get(i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        vibrator.vibrate(20);
+        if(checkBoxChecked) playTone(500, 0.20);
+
     }
 
 
@@ -332,9 +370,9 @@ public class MainActivity extends AppCompatActivity {
 
         public void onFinish() {
             statusText.setText("");
-                bigTapTap.setEnabled(false);
-                bigTapTap.setBackgroundColor(Color.LTGRAY);
-                EndOfTime();
+            bigTapTap.setEnabled(false);
+            bigTapTap.setBackgroundColor(Color.LTGRAY);
+            EndOfTime();
 
 
         }
@@ -361,37 +399,66 @@ public class MainActivity extends AppCompatActivity {
         if(currentInputPattern.Compare(currentGeneratedPattern)) {
             result = "success";
             statusText.setText("Success!!");
+            attemptText.setText("Failed Attempts " + numberOfAttempts);
         } else {
-            numberOfAttempts++;
-            statusText.setText("Failed. Attempt #" + numberOfAttempts);
+            result = "failed";
+            statusText.setText("Failed!!");
+            attemptText.setText("Failed Attempts " + ++numberOfAttempts);
         }
 
-        if(numberOfAttempts < 4) {
-            bigTapTap.setEnabled(true);
-            bigTapTap.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-            currentInputPattern = new Pattern();
-            return;
-        }
+
+
+        logger.Set(DataEnum.SEQUENCE, currentInputPattern.getRatioList().toString());
+        logger.Set(DataEnum.GENSEQUENCE, currentGeneratedPattern.getRatioList().toString());
+        logger.Set(DataEnum.USER_ID, currentUser.getUsername());
+        logger.Set(DataEnum.RESULT, result);
+        logger.Set(DataEnum.ATTEMPTS, String.valueOf(numberOfAttempts));
+        logger.Set(DataEnum.USERTAPS, String.valueOf(currentInputPattern.numberOfTaps));
+        logger.Set(DataEnum.GENTAPS, String.valueOf(currentGeneratedPattern.numberOfTaps));
+
+        bigTapTap.setEnabled(true);
+        bigTapTap.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        currentInputPattern = new Pattern();
 
         currentUser.sequences.put(selectedCategory,currentInputPattern);
 
         Log.d("DEBUG", "PUT into hash map " + selectedCategory
                 + ", current interval "+ currentInputPattern);
 
-        logger.Set(DataEnum.RESULT, result);
-        logger.Set(DataEnum.SEQUENCE, currentInputPattern.getRatioList().toString());
+
 
         logger.writeToFile(true);
 
-        currentInputPattern.numberOfTaps = 0;
+        //currentInputPattern.numberOfTaps = 0;
 
         // Add
         users.add(currentUser);
 
         // Clear
         intervalsBetweenTaps.clear();
-        currentInputPattern = new Pattern();
-        numberOfAttempts = 0;
+
+        if (result.compareTo("success") == 0){
+            statusText.setText("Success!!");
+            currentInputPattern.numberOfTaps = 0;
+
+            bigTapTap.setEnabled(false);
+            bigTapTap.setBackgroundColor(Color.LTGRAY);
+            attemptText.setText("");
+            return;
+        }
+
+        if(numberOfAttempts > 2) {
+            numberOfAttempts = 0;
+            statusText.setText("You have failed 3 attempts. Generate a new password");
+            currentInputPattern.numberOfTaps = 0;
+
+            bigTapTap.setEnabled(false);
+            bigTapTap.setBackgroundColor(Color.LTGRAY);
+            attemptText.setText("");
+
+            return;
+        }
+
     }
 
     private void PopulateDropDownMenu(){

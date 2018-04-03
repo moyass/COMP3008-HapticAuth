@@ -40,14 +40,18 @@ public class Logger {
 
     private File newFile = new File(directory, "userdata-"+ FileNameDataFormat.format(date) +".csv");
 
-    private String  userID      = "JONDOE",
-                    environment = "Android Application",
-                    scheme      = "Rhythm matching",
-                    mode        = "N/A",
-                    event       = "N/A",
-                    result      = "N/A",
-                    cookie      = "N/A",
-                    sequence    = "N/A";
+    private String  userID      = "userid",
+                    environment = "enviroment",
+                    scheme      = "scheme",
+                    mode        = "mode",
+                    event       = "event",
+                    category    = "category",
+                    result      = "result",
+                    userTaps    = "user taps",
+                    genTaps     = "generated taps",
+                    attempts    = "attempts",
+                    sequence    = "sequence",
+                    gensequence = "generated sequence";
 
 
     public Logger (){
@@ -60,6 +64,20 @@ public class Logger {
         fileName = input;
         InitializeFile();
         writeToFile(false);
+    }
+
+    public void Reset(){
+        userID      = "";
+        environment = "";
+        scheme      = "";
+        mode        = "";
+        event       = "";
+        category    = "";
+        result      = "";
+        userTaps    = "";
+        genTaps     = "";
+        attempts    = "";
+        sequence    = "";
     }
 
     public void Set (DataEnum dataEnum, String data){
@@ -83,10 +101,25 @@ public class Logger {
                 result = data;
                 break;
             case COOKIE:
-                cookie = data;
+                userTaps = data;
                 break;
             case SEQUENCE:
                 sequence = data;
+                break;
+            case ATTEMPTS:
+                attempts = data;
+                break;
+            case USERTAPS:
+                userTaps = data;
+                break;
+            case GENTAPS:
+                genTaps = data;
+                break;
+            case GENSEQUENCE:
+                gensequence = data;
+                break;
+            case CATEGORY:
+                category = data;
                 break;
         }
     }
@@ -130,14 +163,19 @@ public class Logger {
                 + scheme        + ","
                 + mode          + ","
                 + event         + ","
+                + category      + ","
                 + result        + ","
-                + cookie        + ","
-                + sequence      + "\n";
+                + userTaps      + ","
+                + genTaps       + ","
+                + attempts      + ","
+                + sequence      + ","
+                + gensequence   + "\n";
 
         try  {
             FileOutputStream fOut = new FileOutputStream(newFile, append);
             OutputStreamWriter outputWriter=new OutputStreamWriter(fOut);
             outputWriter.write(data);
+            Log.d("LOG OUTPUT", data);
             outputWriter.close();
 
             //display file saved message
