@@ -59,8 +59,6 @@ import java.util.List;
  *      - User gets feedback from both a blinking box and haptic feedback
  *      - User is then asked to re-enter the password
  *
- * TODO: - Implement User and remove the listOfPatterns arraylist
- *       - Implement a category choice to set a sequence for each category (shop, email, bank..etc)
  *
  * */
 
@@ -204,8 +202,10 @@ public class MainActivity extends AppCompatActivity {
                 // TODO Auto-generated method stub
                 if(satView.isChecked()){
                     checkBoxChecked = true;
+                    logger.Set(DataEnum.SOUND,"true");
                 }else{
                     checkBoxChecked = false;
+                    logger.Set(DataEnum.SOUND,"false");
                 }
             }
         });
@@ -221,10 +221,9 @@ public class MainActivity extends AppCompatActivity {
                         case DialogInterface.BUTTON_POSITIVE:
                             System.out.println("DEBUG: Creating a new user. Resetting all fields");
                             CREATE_NEW = true;
-                            //currentUser = new User();
+                            currentUser.generateUserName();
                             userName.setText(currentUser.getUsername());
                             logger.Set(DataEnum.USER_ID, currentUser.getUsername());
-                            //EndOfTime();
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
                             System.out.println("DEBUG: Canceled the making of a new user.");
@@ -405,8 +404,6 @@ public class MainActivity extends AppCompatActivity {
             statusText.setText("Failed!!");
             attemptText.setText("Failed Attempts " + ++numberOfAttempts);
         }
-
-
 
         logger.Set(DataEnum.SEQUENCE, currentInputPattern.getRatioList().toString());
         logger.Set(DataEnum.GENSEQUENCE, currentGeneratedPattern.getRatioList().toString());

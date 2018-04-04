@@ -51,8 +51,8 @@ public class Logger {
                     genTaps     = "generated taps",
                     attempts    = "attempts",
                     sequence    = "sequence",
-                    gensequence = "generated sequence";
-
+                    gensequence = "generated sequence",
+                    sound = "sound";
 
     public Logger (){
         InitializeFile();
@@ -104,7 +104,7 @@ public class Logger {
                 userTaps = data;
                 break;
             case SEQUENCE:
-                sequence = data;
+                sequence = "\"" + data + "\"";
                 break;
             case ATTEMPTS:
                 attempts = data;
@@ -116,11 +116,13 @@ public class Logger {
                 genTaps = data;
                 break;
             case GENSEQUENCE:
-                gensequence = data;
+                gensequence = "\"" + data + "\"";
                 break;
             case CATEGORY:
                 category = data;
                 break;
+            case SOUND:
+                sound = data;
         }
     }
 
@@ -169,7 +171,8 @@ public class Logger {
                 + genTaps       + ","
                 + attempts      + ","
                 + sequence      + ","
-                + gensequence   + "\n";
+                + gensequence   + ","
+                + sound + "\n";
 
         try  {
             FileOutputStream fOut = new FileOutputStream(newFile, append);
