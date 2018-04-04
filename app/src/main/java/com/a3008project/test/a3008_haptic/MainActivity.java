@@ -1,28 +1,22 @@
 package com.a3008project.test.a3008_haptic;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.os.Vibrator;
-import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -68,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Our primary database to store users
     Database users = new Database();
-    Button bigTapTap, createSequence, loginButton, generatePassword, aboutButton;
+    Button bigTapTap, repeatSequence, loginButton, generatePassword, aboutButton;
     CheckBox satView, satView2;
     boolean checkBoxChecked = false;
     ImageButton ProfileButton;
@@ -87,12 +81,13 @@ public class MainActivity extends AppCompatActivity {
 
     Pattern testPattern;
     int numberOfAttempts = 0;
+    boolean attemptGoingOn = false;
 
 
-    private View.OnClickListener createButtonListener = new View.OnClickListener() {
+    private View.OnClickListener repeatButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            CreateButtonClicked();
+            RepeatButtonClicked();
         }
     };
 
@@ -133,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         bigTapTap.setBackgroundColor(Color.LTGRAY);
 
         // Create a sequence
-        createSequence = findViewById(R.id.createButton);
+        repeatSequence = findViewById(R.id.createButton);
 
         // Generate a sequence
         generatePassword = findViewById(R.id.generateButton);
@@ -168,14 +163,17 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Generate a username every time the app is launched
-        currentUser.generateUserName();
-        logger.Set(DataEnum.USER_ID, currentUser.getUsername());
+        //currentUser.generateUserName(false);
+
+
 
         currentInputPattern.numberOfTaps = 0;
 
         // Initialize log file
         //logger.writeToFile(false);
         logger.Reset();
+        logger.Set(DataEnum.USER_ID, currentUser.getUsername());
+        logger.Set(DataEnum.SOUND,"false");
         logger.Set(DataEnum.ENVIRONMENT, "android");
         logger.Set(DataEnum.SCHEME, "rhythm");
         logger.Set(DataEnum.EVENT, "register");
@@ -190,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
         // DropDownMenu
         PopulateDropDownMenu();
 
-        createSequence.setOnClickListener(createButtonListener);
+        repeatSequence.setOnClickListener(repeatButtonListener);
         generatePassword.setOnClickListener(GenerateButtonListener);
         bigTapTap.setOnClickListener(BigTapTapListener);
         aboutButton.setOnClickListener(AboutButtonListener);
@@ -220,10 +218,30 @@ public class MainActivity extends AppCompatActivity {
                     switch (which){
                         case DialogInterface.BUTTON_POSITIVE:
                             System.out.println("DEBUG: Creating a new user. Resetting all fields");
-                            CREATE_NEW = true;
-                            currentUser.generateUserName();
+
+                            // Check if the user is currently attempting to register / login or not
+                            /** TODO:
+                             * Currently just changes the username in text without actually creating
+                             * a new user object. The problem is making sure the user can't create
+                             * a new user while attempting to login...
+                             * For now and for the sake of logs we can just change the username
+                             * while we do the testing
+                             */
+                            /* UNCOMMENT ME TO FIX PREVIOUS TODO
+                            if(!attemptGoingOn) {
+                                statusText.setText("");   // Clear status text
+                                currentUser = new User(); // Default Constructor generates username
+                                userName.setText(currentUser.getUsername());
+                                logger.Set(DataEnum.USER_ID, currentUser.getUsername());
+                            } else {
+                                Toast.makeText(MainActivity.this, "Cannot create user while attempting!", Toast.LENGTH_SHORT).show();
+                            }
+                             */
+                            currentUser.generateUserName(true);
                             userName.setText(currentUser.getUsername());
                             logger.Set(DataEnum.USER_ID, currentUser.getUsername());
+
+
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
                             System.out.println("DEBUG: Canceled the making of a new user.");
@@ -259,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getBaseContext(), "Generating new password.", Toast.LENGTH_SHORT).show();
         bigTapTap.setEnabled(true);
         bigTapTap.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-        userName.setText(currentUser.getUsername());
+
         numberOfAttempts = 0;
 
         attemptText.setText("");
@@ -284,6 +302,11 @@ public class MainActivity extends AppCompatActivity {
 
         currentGeneratedPattern = testPattern;
 
+
+        // Attempt is currently begun
+        attemptGoingOn = true;
+
+
         // Logger CSV File
         logger.Set(DataEnum.MODE, "generate");
         logger.Set(DataEnum.CATEGORY, selectedCategory);
@@ -292,18 +315,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void BigTapTapTapped() {
         // Vibrate the phone for some haptic feedback for the user
-        /*
-        if (!START_TIMER) {
-            START_TIMER = true;
-            //oldTime = System.currentTimeMillis();
-            cT.start();
-
-            // We don't care about the first tap as it is just to initiate the tapping input
-            //currentInputPattern.numberOfTaps++;
-
-            System.out.println("DEBUG: Intial Tap. NOT = " + currentInputPattern.numberOfTaps);
-
-        }*/
 
         {
             if (currentInputPattern.numberOfTaps == 0){
@@ -339,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void CreateButtonClicked (){
+    private void RepeatButtonClicked(){
 
         ArrayList<Long> temp = testPattern.getRatioList();
 
@@ -409,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
         logger.Set(DataEnum.GENSEQUENCE, currentGeneratedPattern.getRatioList().toString());
         logger.Set(DataEnum.USER_ID, currentUser.getUsername());
         logger.Set(DataEnum.RESULT, result);
-        logger.Set(DataEnum.ATTEMPTS, String.valueOf(numberOfAttempts));
+        logger.Set(DataEnum.ATTEMPTS, String.valueOf(numberOfAttempts ));
         logger.Set(DataEnum.USERTAPS, String.valueOf(currentInputPattern.numberOfTaps));
         logger.Set(DataEnum.GENTAPS, String.valueOf(currentGeneratedPattern.numberOfTaps));
 
@@ -426,7 +437,6 @@ public class MainActivity extends AppCompatActivity {
 
         logger.writeToFile(true);
 
-        //currentInputPattern.numberOfTaps = 0;
 
         // Add
         users.add(currentUser);
@@ -452,6 +462,7 @@ public class MainActivity extends AppCompatActivity {
             bigTapTap.setEnabled(false);
             bigTapTap.setBackgroundColor(Color.LTGRAY);
             attemptText.setText("");
+            attemptGoingOn = false;
 
             return;
         }

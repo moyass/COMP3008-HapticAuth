@@ -13,7 +13,6 @@ public class Pattern {
 
     private ArrayList<Long> RatioList = new ArrayList<>();
     int numberOfTaps = 0;
-    private Timer timer = new Timer(5);
 
     // DISCUS WITH THE REST OF THE GROUP
     public int UpperGenerateBound = 6;
@@ -22,7 +21,6 @@ public class Pattern {
     public int LowerIntervalBound = 200;
 
     double marginOfError = 0.35;
-
 
     Pattern (ArrayList<Long> inputRatios, int inputNumberOfTaps){
         RatioList = inputRatios;
