@@ -1,6 +1,8 @@
 ### COMP 3000 - Rhythmic Authentication
 
-- Fill this area as you please...
+The goal of this project is to develop and explore a different method of authentication. Using haptic feedback and rythmic patterns a user is able to input their "password" without someone pressing keys.
+
+
 
 #### Dependencies
  - [Android Studio](https://developer.android.com/studio/index.html)
